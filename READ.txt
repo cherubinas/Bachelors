@@ -1,0 +1,30 @@
+
+In this folder:
+
+bin – 
+
+doc – includes the PDF of the written work, the source files of the written work (Overleaf source code), and the graphical resources used in the written work.
+
+src – contains all source code:
+
+main.sh – the main script
+
+V1.yml – victim script for generating a large number of TCP connections to an external internet resource
+
+V2.yml – victim script for SSH brute-force attacks
+
+V3.yml – victim script for a malicious file detected but not deleted
+
+A1.yml – attacker script for generating a large number of TCP connections to an external internet resource
+
+A2.yml – attacker script for SSH brute-force attacks
+
+A3.yml – attacker script for a malicious file detected but not deleted
+
+SIEM.py – data analysis and offense detection code
+
+SIEM_rules.json – a list of available rules
+
+rules_manager.py – rule management code
+
+	
