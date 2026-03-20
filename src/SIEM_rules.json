@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Malicious object detected but not deleted",
+    "type": "packet",
+    "description": "Detects a malicious object, but no remediation steps were taken following detection.",
+    "magnitude": "high",
+    "match": {
+      "protocol": "TCP",
+      "payload_contains": [
+        "POST",
+        "/MALWARE_DETECTED"
+      ]
+    }
+  },
+  {
+    "name": "SSH Brute-force",
+    "type": "stateful",
+    "description": "Detects a source IP that sends 10 or more TCP SYN packets to port 22 within 30 seconds. This is classified as an SSH brute-force attempt.",
+    "magnitude": "medium",
+    "match": {
+      "protocol": "TCP",
+      "dst_port": 22
+    },
+    "aggregate": {
+      "group_by": [
+        "src_ip"
+      ],
+      "time_window": 30,
+      "threshold": 10
+    }
+  },
+  {
+    "name": "Large Number of TCP Connections to External Internet Resources",
+    "type": "stateful",
+    "description": "Detects 9 HTTP GET requests to the same external resource within 60 seconds.",
+    "magnitude": "low",
+    "match": {
+      "protocol": "TCP",
+      "payload_contains": [
+        "GET "
+      ]
+    },
+    "aggregate": {
+      "group_by": [
+        "src_ip",
+        "dst_ip"
+      ],
+      "time_window": 60,
+      "threshold": 9
+    }
+  }
+]

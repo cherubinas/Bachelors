@@ -1,0 +1,26 @@
+---
+- hosts: attacker
+  become: yes
+  vars:
+     eicar_file: "/home/evil.exe"
+     pcap_file: "/home/captureA_file.pcap"
+
+  tasks:
+    - name: Install tcpdump and apache2
+      apt:
+        name:
+          - tcpdump
+          - apache2
+        state: present
+        update_cache: yes
+
+    - name: Run tcpdump in background
+      shell: tcpdump -i eth0 -w {{ pcap_file }} -U tcp port 80 &
+      async: 90
+      poll: 0
+
+    - name: Write EICAR test file to web root
+      copy:
+        dest: "/var/www/html/evil.exe"
+        content: "X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
+        mode: "0644"

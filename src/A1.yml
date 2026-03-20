@@ -1,0 +1,49 @@
+- hosts: attacker
+  become: yes
+  vars:
+    pcap_file: /home/captureA_tcp.pcap
+    responder_ports:
+      - 8001
+      - 8002
+      - 8003
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - tcpdump
+          - python3
+          - apache2
+        state: present
+        update_cache: yes
+
+    - name: Start python http.server responders 
+      shell: |
+        for p in {{ responder_ports | join(' ') }}; do
+          nohup python3 -m http.server $p --bind 0.0.0.0 &
+        done
+      args:
+        executable: /bin/bash
+
+    - name: Create a script for victim 
+      copy:
+        dest: "/var/www/html/script.sh"
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          #  TCP connections to attacker
+          TARGET_IP="{{ ansible_default_ipv4.address }}"
+          
+          #  9 connections (3 for each port)
+          for round in 1 2 3; do
+            curl --max-time 3 "http://${TARGET_IP}:8001" &
+            curl --max-time 3 "http://${TARGET_IP}:8002" &
+            curl --max-time 3 "http://${TARGET_IP}:8003" &
+          done
+    
+          wait
+
+    - name: Run tcpdump in background
+      shell: tcpdump -i eth0 -w {{ pcap_file }} -U 'tcp and not port 22' &
+      async: 300
+      poll: 0

