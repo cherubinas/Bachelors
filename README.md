@@ -18,6 +18,8 @@ PCAP(Packet Capture) format. These PCAP files are then processed by a detection 
 tifies the unique patterns associated with each offense type based on a rule system. The analyzed
 results are presented to the user in an offense-style format, following the traditional layout of SIEM
 tool offenses
+
+
 Files:
 
 bin – 
