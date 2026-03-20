@@ -26,21 +26,21 @@ bin –
 
 doc – includes the PDF of the written work, the source files of the written work (Overleaf source code), and the graphical resources used in the written work.
 
-src – contains all source code:
+src – contains all of the source code:
 
 main.sh – the main script
 
-V1.yml – victim script for generating a large number of TCP connections to an external internet resource
+V1.yml – victim script for generating a large number of TCP connections to an external internet resource offense simulation
 
-V2.yml – victim script for SSH brute-force attacks
+V2.yml – victim script for SSH brute-force  offense simulation
 
-V3.yml – victim script for a malicious file detected but not deleted
+V3.yml – victim script for a malicious file detected but not deleted  offense simulation
 
-A1.yml – attacker script for generating a large number of TCP connections to an external internet resource
+A1.yml – attacker script for generating a large number of TCP connections to an external internet resource  offense simulation
 
-A2.yml – attacker script for SSH brute-force attacks
+A2.yml – attacker script for SSH brute-force  offense simulation
 
-A3.yml – attacker script for a malicious file detected but not deleted
+A3.yml – attacker script for a malicious file detected but not deleted  offense simulation
 
 SIEM.py – data analysis and offense detection code
 
